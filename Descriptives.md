@@ -17,21 +17,67 @@ library(reshape2)
 library(ggplot2)
 ```
 
-Aantal participanten per schooljaar
+Aantal participanten per school
+
+``` r
+data_ucanfeel$school <- as.factor(data_ucanfeel$school)
+
+levels(data_ucanfeel$school)
+```
+
+    ## [1] "CapellenCampus"                 "GreijdanusCollege"             
+    ## [3] "MeanderCollege"                 "Mens&"                         
+    ## [5] "ThomasáKempisCollege"           "ThorbeckeScholengemeenschapMHA"
+    ## [7] "Zone.college"
 
 ``` r
 pp_school <- data_ucanfeel %>%
-  group_by(schooljaar) %>%
+  group_by(school) %>%
   summarise(n_id = n_unique(id))
 ```
 
 ``` r
-apa_table(pp_school, caption="Aantal participanten per schooljaar")
+apa_table(pp_school, caption="Aantal participanten per school")
 ```
 
 <caption>
 
 (\#tab:unnamed-chunk-4)
+
+</caption>
+
+<div data-custom-style="Table Caption">
+
+*Aantal participanten per school*
+
+</div>
+
+| school                         | n\_id |
+| :----------------------------- | :---- |
+| CapellenCampus                 | 29    |
+| GreijdanusCollege              | 19    |
+| MeanderCollege                 | 17    |
+| Mens&                          | 5     |
+| ThomasáKempisCollege           | 26    |
+| ThorbeckeScholengemeenschapMHA | 29    |
+| Zone.college                   | 30    |
+| NA                             | 4     |
+
+Aantal participanten per schooljaar
+
+``` r
+pp_schooljaar <- data_ucanfeel %>%
+  group_by(schooljaar) %>%
+  summarise(n_id = n_unique(id))
+```
+
+``` r
+apa_table(pp_schooljaar, caption="Aantal participanten per schooljaar")
+```
+
+<caption>
+
+(\#tab:unnamed-chunk-6)
 
 </caption>
 
@@ -49,11 +95,62 @@ apa_table(pp_school, caption="Aantal participanten per schooljaar")
 | 5          | 25    |
 | NA         | 1     |
 
-Gemiddelden en SDs schoolfactoren (tevredenheid etc) per schooljaar
+En per school per schooljaar
+
+``` r
+pp_school_schooljaar <- data_ucanfeel %>%
+  group_by(school, schooljaar) %>%
+  summarise(n_id = n_unique(id))
+```
+
+``` r
+apa_table(pp_school_schooljaar, caption="Aantal participanten per schooljaar per school")
+```
+
+<caption>
+
+(\#tab:unnamed-chunk-8)
+
+</caption>
+
+<div data-custom-style="Table Caption">
+
+*Aantal participanten per schooljaar per school*
+
+</div>
+
+| school                         | schooljaar | n\_id |
+| :----------------------------- | :--------- | :---- |
+| CapellenCampus                 | 3          | 11    |
+| CapellenCampus                 | 4          | 8     |
+| CapellenCampus                 | 5          | 10    |
+| GreijdanusCollege              | 2          | 1     |
+| GreijdanusCollege              | 3          | 13    |
+| GreijdanusCollege              | 4          | 3     |
+| GreijdanusCollege              | 5          | 2     |
+| MeanderCollege                 | 3          | 7     |
+| MeanderCollege                 | 4          | 7     |
+| MeanderCollege                 | 5          | 3     |
+| Mens&                          | 2          | 5     |
+| ThomasáKempisCollege           | 2          | 3     |
+| ThomasáKempisCollege           | 3          | 11    |
+| ThomasáKempisCollege           | 4          | 5     |
+| ThomasáKempisCollege           | 5          | 7     |
+| ThorbeckeScholengemeenschapMHA | 3          | 25    |
+| ThorbeckeScholengemeenschapMHA | 4          | 2     |
+| ThorbeckeScholengemeenschapMHA | 5          | 2     |
+| Zone.college                   | 2          | 13    |
+| Zone.college                   | 3          | 17    |
+| NA                             | 2          | 1     |
+| NA                             | 3          | 1     |
+| NA                             | 5          | 1     |
+| NA                             | NA         | 1     |
+
+Gemiddelden en SDs schoolfactoren (tevredenheid etc) per school
 
 ``` r
 schoolfactoren <- data_ucanfeel %>%
-  group_by(schooljaar) %>%
+  group_by(school) %>%
   summarise(across(TR:AE_Stress, .fns=list(Mean = mean, SD = sd), na.rm=TRUE,
                    .names="{col}_{fn}"))
 
@@ -62,16 +159,59 @@ schoolfactoren <- schoolfactoren %>%
 ```
 
 TR = Teacher relationships SC = School connectedness AS = Academic
-support OD = Order and discipline ASF = Academic
-satisfaction
+support OD = Order and discipline ASF = Academic satisfaction
 
 ``` r
-apa_table(schoolfactoren, caption="Schoolfactoren (M, SD) per schooljaar")
+apa_table(schoolfactoren, caption="Schoolfactoren (M, SD) per school")
 ```
 
 <caption>
 
-(\#tab:unnamed-chunk-6)
+(\#tab:unnamed-chunk-10)
+
+</caption>
+
+<div data-custom-style="Table Caption">
+
+*Schoolfactoren (M, SD) per
+school*
+
+</div>
+
+| school                         | TR\_Mean | TR\_SD | SC\_Mean | SC\_SD | AS\_Mean | AS\_SD | OD\_Mean | OD\_SD | ASF\_Mean | ASF\_SD | AE\_Stress\_Mean | AE\_Stress\_SD |
+| :----------------------------- | :------- | :----- | :------- | :----- | :------- | :----- | :------- | :----- | :-------- | :------ | :--------------- | :------------- |
+| CapellenCampus                 | 61.88    | 19.32  | 45.28    | 17.72  | 68.56    | 16.35  | 70.51    | 14.28  | 44.89     | 25.93   | 58.48            | 17.53          |
+| GreijdanusCollege              | 63.56    | 18.01  | 45.47    | 20.32  | 68.54    | 9.50   | 71.80    | 14.49  | 53.09     | 23.97   | 52.95            | 16.99          |
+| MeanderCollege                 | 68.06    | 13.97  | 48.12    | 23.11  | 75.00    | 12.77  | 71.98    | 20.57  | 52.00     | 25.27   | 46.22            | 27.11          |
+| Mens&                          | 63.40    | 27.94  | 61.00    | 33.10  | 70.73    | 17.06  | 71.46    | 17.20  | 79.80     | 35.66   | 53.77            | 27.58          |
+| ThomasáKempisCollege           | 65.95    | 15.21  | 45.18    | 21.92  | 71.43    | 9.71   | 71.87    | 13.50  | 47.56     | 21.97   | 47.87            | 27.98          |
+| ThorbeckeScholengemeenschapMHA | 61.89    | 20.46  | 52.74    | 21.46  | 72.31    | 15.11  | 74.68    | 15.67  | 45.50     | 31.99   | 48.70            | 27.29          |
+| Zone.college                   | 64.37    | 18.29  | 45.02    | 22.60  | 68.71    | 15.51  | 67.51    | 17.06  | 43.55     | 29.09   | 46.29            | 28.79          |
+| NA                             | 70.17    | 18.32  | 67.75    | 9.47   | 70.00    | 18.55  | 74.50    | 8.25   | 73.00     | 11.75   | 44.78            | 39.83          |
+
+Gemiddelden en SDs schoolfactoren (tevredenheid etc) per schooljaar
+
+``` r
+schoolfactoren_jaar <- data_ucanfeel %>%
+  group_by(schooljaar) %>%
+  summarise(across(TR:AE_Stress, .fns=list(Mean = mean, SD = sd), na.rm=TRUE,
+                   .names="{col}_{fn}"))
+
+schoolfactoren_jaar <- schoolfactoren_jaar %>%
+  mutate(across(2:11, round, 2))
+```
+
+TR = Teacher relationships SC = School connectedness AS = Academic
+support OD = Order and discipline ASF = Academic
+satisfaction
+
+``` r
+apa_table(schoolfactoren_jaar, caption="Schoolfactoren (M, SD) per schooljaar")
+```
+
+<caption>
+
+(\#tab:unnamed-chunk-12)
 
 </caption>
 
@@ -90,19 +230,6 @@ schooljaar*
 | 5          | 63.33    | 15.83  | 49.25    | 19.18  | 71.44    | 10.93  | 71.43    | 13.95  | 52.25     | 26.93   | 58.69            | 18.47          |
 | NA         | 84.11    | NA     | 61.00    | NA     | 93.33    | NA     | 80.43    | NA     | 79.00     | NA      | 1.50             | NA             |
 
-``` r
-school_bp <- data_ucanfeel %>%
-  select(id, TR, SC, AS, OD, ASF, AE_Stress) %>%
-  melt()
-
-ggplot(school_bp, aes(x = variable, y = value)) + 
-  geom_boxplot()
-```
-
-    ## Warning: Removed 60 rows containing non-finite values (stat_boxplot).
-
-![](Descriptives_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
-
 Gemiddelden en SDs angst and depressie en life satisfaction per
 schooljaar
 
@@ -117,18 +244,18 @@ angst_dep_lifesat <- angst_dep_lifesat %>%
 ```
 
 ``` r
-apa_table(angst_dep_lifesat, caption="Angst and depressie per schooljaar")
+apa_table(angst_dep_lifesat, caption="Angst, depressie, life satisfaction per schooljaar")
 ```
 
 <caption>
 
-(\#tab:unnamed-chunk-9)
+(\#tab:unnamed-chunk-14)
 
 </caption>
 
 <div data-custom-style="Table Caption">
 
-*Angst and depressie per
+*Angst, depressie, life satisfaction per
 schooljaar*
 
 </div>
@@ -154,18 +281,18 @@ angst_dep_geslacht <- angst_dep_geslacht %>%
 ```
 
 ``` r
-apa_table(angst_dep_geslacht, caption="Angst and depressie per geslacht")
+apa_table(angst_dep_geslacht, caption="Angst, depressie, life satisfaction per geslacht")
 ```
 
 <caption>
 
-(\#tab:unnamed-chunk-11)
+(\#tab:unnamed-chunk-16)
 
 </caption>
 
 <div data-custom-style="Table Caption">
 
-*Angst and depressie per
+*Angst, depressie, life satisfaction per
 geslacht*
 
 </div>
@@ -187,7 +314,7 @@ data_ucanfeel %>% skim("geslacht", "leeftijd", "schooljaar", "eenhuis", "niveau_
 | :----------------------------------------------- | :--------- |
 | Name                                             | Piped data |
 | Number of rows                                   | 159        |
-| Number of columns                                | 196        |
+| Number of columns                                | 198        |
 | \_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_\_   |            |
 | Column type frequency:                           |            |
 | factor                                           | 4          |

@@ -8,7 +8,8 @@ data_school = read.csv2('responses_school_2021-05-10.csv', na.strings=c(""," ","
 data_wellbeing = read.csv2('responses_wellbeing_2021-05-10.csv', na.strings=c(""," ","NA"))
 data_socialnetworks = read.csv2('responses_socialnetworks_2021-05-10.csv', na.strings=c(""," ","NA"))
 data_demografie = read.csv2('responses_demografie_2021-05-10.csv', na.strings=c(""," ","NA"))
-data_ic = read.csv2('responses_informed_consent_2021-05-10.csv', na.strings=c(""," ","NA"))
+data_people = read.csv2('people_2021-05-31.csv', na.strings=c(""," ","NA"))
+data_consent = read.csv2('responses_consent_otr_2021-05-31.csv', na.strings=c(""," ","NA"))
 
 data_other_factors %>% summarise(complete = sum(!is.na(completed_at)))
 data_school %>% summarise(complete = sum(!is.na(completed_at)))
@@ -16,6 +17,20 @@ data_wellbeing %>% summarise(complete = sum(!is.na(completed_at)))
 data_socialnetworks %>% summarise(complete = sum(!is.na(completed_at)))
 data_demografie %>% summarise(complete = sum(!is.na(completed_at)))
 
+
+MOBILE_PHONE_REGEX <- '^06[0-9]{8}$'
+
+
+normalize_mobile_phone <- function(mobile_phone_orig) {
+  mobile_phone <- gsub(" ", "", mobile_phone_orig)
+  mobile_phone <- gsub("-", "", mobile_phone)
+  if (!stringr::str_detect(mobile_phone, MOBILE_PHONE_REGEX)) {
+    stop(paste('phone number is not valid:', mobile_phone_orig))
+  }
+  return(mobile_phone)
+}
+
+data_consent$v6child <- normalize_mobile_phone(data_consent$v6child)
 
 data_demografie <- data_demografie %>%
   select(-c(response_id, filled_out_for_id, protocol_subscription_id, measurement_id, invitation_set_id,
@@ -585,6 +600,17 @@ data_other4 <- data_other4 %>%
   filter(!is.na(id))
 
 data_new4 <- left_join(data_new3, data_other4, by = "id")
+
+data_people <- data_people %>%
+  select(person_id, team_name)
+
+data_people <- data_people %>%
+  rename(id = person_id,
+         school = team_name)
+
+data_people$school <- as.factor(data_people$school)
+
+levels(data_people$school)
 
 data_ucanfeel <- data_new4
 

@@ -23,21 +23,47 @@ library(reshape2)
 library(ggplot2)
 ```
 
+Aantal participanten per school
+```{r, message=F}
+data_ucanfeel$school <- as.factor(data_ucanfeel$school)
+
+levels(data_ucanfeel$school)
+
+pp_school <- data_ucanfeel %>%
+  group_by(school) %>%
+  summarise(n_id = n_unique(id))
+``` 
+
+```{r, message=F}
+apa_table(pp_school, caption="Aantal participanten per school")
+```
+
 Aantal participanten per schooljaar
 ```{r, message=F}
-pp_school <- data_ucanfeel %>%
+pp_schooljaar <- data_ucanfeel %>%
   group_by(schooljaar) %>%
   summarise(n_id = n_unique(id))
 ``` 
 
 ```{r, message=F}
-apa_table(pp_school, caption="Aantal participanten per schooljaar")
+apa_table(pp_schooljaar, caption="Aantal participanten per schooljaar")
 ```
 
-Gemiddelden en SDs schoolfactoren (tevredenheid etc) per schooljaar
+En per school per schooljaar
+```{r, message=F}
+pp_school_schooljaar <- data_ucanfeel %>%
+  group_by(school, schooljaar) %>%
+  summarise(n_id = n_unique(id))
+``` 
+
+```{r, message=F}
+apa_table(pp_school_schooljaar, caption="Aantal participanten per schooljaar per school")
+```
+
+Gemiddelden en SDs schoolfactoren (tevredenheid etc) per school
 ```{r, message=F}
 schoolfactoren <- data_ucanfeel %>%
-  group_by(schooljaar) %>%
+  group_by(school) %>%
   summarise(across(TR:AE_Stress, .fns=list(Mean = mean, SD = sd), na.rm=TRUE,
                    .names="{col}_{fn}"))
 
@@ -51,16 +77,27 @@ OD = Order and discipline
 ASF = Academic satisfaction
 
 ```{r, message=F}
-apa_table(schoolfactoren, caption="Schoolfactoren (M, SD) per schooljaar")
+apa_table(schoolfactoren, caption="Schoolfactoren (M, SD) per school")
 ```
 
+Gemiddelden en SDs schoolfactoren (tevredenheid etc) per schooljaar
 ```{r, message=F}
-school_bp <- data_ucanfeel %>%
-  select(id, TR, SC, AS, OD, ASF, AE_Stress) %>%
-  melt()
+schoolfactoren_jaar <- data_ucanfeel %>%
+  group_by(schooljaar) %>%
+  summarise(across(TR:AE_Stress, .fns=list(Mean = mean, SD = sd), na.rm=TRUE,
+                   .names="{col}_{fn}"))
 
-ggplot(school_bp, aes(x = variable, y = value)) + 
-  geom_boxplot()
+schoolfactoren_jaar <- schoolfactoren_jaar %>%
+  mutate(across(2:11, round, 2))
+```
+TR = Teacher relationships
+SC = School connectedness 
+AS = Academic support
+OD = Order and discipline
+ASF = Academic satisfaction
+
+```{r, message=F}
+apa_table(schoolfactoren_jaar, caption="Schoolfactoren (M, SD) per schooljaar")
 ```
 
 Gemiddelden en SDs angst and depressie en life satisfaction per schooljaar
@@ -75,7 +112,7 @@ angst_dep_lifesat <- angst_dep_lifesat %>%
 ```
 
 ```{r, message=F}
-apa_table(angst_dep_lifesat, caption="Angst and depressie per schooljaar")
+apa_table(angst_dep_lifesat, caption="Angst, depressie, life satisfaction per schooljaar")
 ```
 
 Jongens vs meisjes (jongen = 0, meisje = 1, anders = 2)
@@ -90,7 +127,7 @@ angst_dep_geslacht <- angst_dep_geslacht %>%
 ```
 
 ```{r, message=F}
-apa_table(angst_dep_geslacht, caption="Angst and depressie per geslacht")
+apa_table(angst_dep_geslacht, caption="Angst, depressie, life satisfaction per geslacht")
 ```
 
 
